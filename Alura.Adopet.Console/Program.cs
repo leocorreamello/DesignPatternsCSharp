@@ -1,5 +1,13 @@
 ﻿using System.Net.Http.Headers;
-using Alura.Adopet.Console;
+using Alura.Adopet.Console.Comandos;
+
+Dictionary<string, IComando> comandosDoSistema = new()
+{
+    { "import", new Import() },
+    { "help", new Help() },
+    { "show", new Show() },
+    { "list", new List() },
+};
 
 // cria instância de HttpClient para consumir API Adopet
 HttpClient client = ConfiguraHttpClient("http://localhost:5057");
@@ -7,28 +15,13 @@ Console.ForegroundColor = ConsoleColor.Green;
 try
 {
     string comando = args[0].Trim();
-    switch (comando)
+    if (comandosDoSistema.ContainsKey(comando))
     {
-        case "import":
-            var import = new Import();
-            await import.ImportacaoArquivoPetAsync(caminhoDoArquivoDeImportacao: args[1]);
-            break;
-        case "help":
-            var help = new Help();
-            help.ExibirAjuda(caminhoDoArquivoDeImportacao: args);
-            break;
-        case "show":
-            var show = new Show();
-            show.ExibirConteudoDoArquivo(caminhoDoArquivoDeImportacao: args[1]);
-            break;
-        case "list":
-            var list = new List(client);
-            await list.ExibirListaDePets();
-            break;
-        default:
-            // exibe mensagem de comando inválido
-            Console.WriteLine("Comando inválido!");
-            break;
+        var comandoSelecionado = comandosDoSistema[comando];
+        await comandoSelecionado.ExecutarAsync(args);
+    }
+    else {
+        Console.WriteLine("Comando inválido!");
     }
 }
 catch (Exception ex)

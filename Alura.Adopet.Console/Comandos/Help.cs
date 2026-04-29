@@ -1,12 +1,18 @@
 ﻿using System.Reflection;
 
-namespace Alura.Adopet.Console;
+namespace Alura.Adopet.Console.Comandos;
 
 [DocComando(instrucao: "help",
             documentacao: "Execute 'adopet.exe help [comando]' para obter mais informações sobre um comando. \n\n" +
                           "adopet help <parametro> ous simplemente adopet help comando que exibe informações de ajuda dos comandos.")]
-internal class Help
+internal class Help : IComando
 {
+    public Task ExecutarAsync(string[] args)
+    {
+        this.ExibirAjuda(caminhoDoArquivoDeImportacao: args);
+        return Task.CompletedTask;
+    }
+
     private Dictionary<string, DocComando> docs;
 
     public Help()
@@ -16,7 +22,8 @@ internal class Help
             .Select(t => t.GetCustomAttribute<DocComando>()!)
             .ToDictionary(d => d.Instrucao);
     }
-    public void ExibirAjuda(string[] caminhoDoArquivoDeImportacao)
+
+    private void ExibirAjuda(string[] caminhoDoArquivoDeImportacao)
     {
         System.Console.WriteLine("Lista de comandos.");
         if (caminhoDoArquivoDeImportacao.Length == 1)

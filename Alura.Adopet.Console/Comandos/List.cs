@@ -1,18 +1,25 @@
-﻿using System.Net.Http.Headers;
+﻿using Alura.Adopet.Console.Modelos;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
-namespace Alura.Adopet.Console;
+namespace Alura.Adopet.Console.Comandos;
 
 [DocComando(instrucao: "list",
             documentacao: "adopet list comando que exibe no terminal o conteúdo cadastrado na base de dados da AdoPet.")]
-internal class List
+internal class List : IComando
 {
+    public async Task ExecutarAsync(string[] args)
+    {
+        await this.ExibirListaDePets();
+    }
+
     HttpClient client;
-    public List(HttpClient client)
+    public List()
     {
         this.client = ConfiguraHttpClient("http://localhost:5057");
     }
-    public async Task ExibirListaDePets()
+
+    private async Task ExibirListaDePets()
     {
         var pets = await ListPetsAsync();
         foreach (var pet in pets)
